@@ -15,6 +15,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var networkBenchmarkService: NetworkBenchmarkService
     private var isBind = false
+    private var handler:Handler? = null
+
     private val conn = object : ServiceConnection {
 
         override fun onServiceConnected(componentName: ComponentName, service: IBinder) {
@@ -46,6 +48,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        @SuppressLint("HandlerLeak")
+        handler = object : Handler() {
+            override fun handleMessage(msg: Message) {
+                val logString = networkBenchmarkService.getBenchmarkLogger()
+
+                logView.text = logString
+            }
+        }
+
         startButton.setOnClickListener {
             val intent = Intent(this, NetworkBenchmarkService::class.java)
 
@@ -54,7 +65,7 @@ class MainActivity : AppCompatActivity() {
                 bindService(intent, conn, Context.BIND_AUTO_CREATE)
             }
 
-            networkBenchmarkService.startBenchmark()
+            networkBenchmarkService.startBenchmark(handler!!)
             logView.text = networkBenchmarkService.onClick()
         }
 
