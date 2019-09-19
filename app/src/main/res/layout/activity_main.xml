@@ -7,28 +7,26 @@
     tools:context=".MainActivity">
 
     <TextView
-        android:id="@+id/textView2"
-        android:layout_width="316dp"
-        android:layout_height="0dp"
+        android:id="@+id/logView"
+        android:layout_width="291dp"
+        android:layout_height="215dp"
         android:layout_marginTop="60dp"
         android:text="Hello World!"
-        app:layout_constraintBottom_toTopOf="@+id/activeButton"
         app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/activeButton"
+        android:id="@+id/startButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="48dp"
-        android:text="Button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:layout_marginStart="39dp"
+        android:layout_marginBottom="34dp"
+        android:text="Start"
+        app:layout_constraintBottom_toTopOf="@+id/downloadTestSwitch"
+        app:layout_constraintStart_toStartOf="@+id/logView"
+        app:layout_constraintTop_toBottomOf="@+id/title" />
 
     <EditText
         android:id="@+id/editText3"
@@ -46,12 +44,46 @@
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_marginTop="7dp"
+        android:layout_marginBottom="223dp"
         android:clickable="false"
         android:ems="10"
         android:inputType="textPersonName"
         android:text="속도측정테스트"
-        app:layout_constraintBottom_toTopOf="@+id/textView2"
-        tools:layout_editor_absoluteX="99dp" />
+        app:layout_constraintBottom_toTopOf="@+id/startButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/stopButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="39dp"
+        android:text="Stop"
+        app:layout_constraintEnd_toEndOf="@+id/logView"
+        app:layout_constraintTop_toBottomOf="@+id/logView" />
+
+    <Switch
+        android:id="@+id/downloadTestSwitch"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="11dp"
+        android:text="다운로드 테스트"
+        app:layout_constraintBottom_toTopOf="@+id/uploadTestSwitch"
+        app:layout_constraintEnd_toEndOf="@+id/uploadTestSwitch"
+        app:layout_constraintStart_toStartOf="@+id/uploadTestSwitch"
+        app:layout_constraintTop_toBottomOf="@+id/startButton" />
+
+    <Switch
+        android:id="@+id/uploadTestSwitch"
+        android:layout_width="153dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="59dp"
+        android:layout_marginBottom="201dp"
+        android:text="업로드 테스트"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/downloadTestSwitch" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
