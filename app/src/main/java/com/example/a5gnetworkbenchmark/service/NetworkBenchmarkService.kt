@@ -11,9 +11,6 @@ import fr.bmartel.speedtest.SpeedTestReport
 import fr.bmartel.speedtest.SpeedTestSocket
 import fr.bmartel.speedtest.inter.ISpeedTestListener
 import fr.bmartel.speedtest.model.SpeedTestError
-import java.lang.RuntimeException
-import java.lang.StringBuilder
-import fr.bmartel.speedtest.utils.SpeedTestUtils
 import kotlin.concurrent.thread
 
 
@@ -21,6 +18,8 @@ class NetworkBenchmarkService : Service() {
 
     private val binder = LocalBinder()
     private val benchmarkLogger = StringBuilder()
+    private var testThread:Thread? = null
+    private var speedTest:SpeedTestSocket? = null
     var isDownloadTest:Boolean? = null
     var isUploadTest:Boolean? = null
 
@@ -51,8 +50,8 @@ class NetworkBenchmarkService : Service() {
     }
 
     fun activeDownloadTest(active:Boolean){
-        isUploadTest = !active
         isDownloadTest = active
+        isUploadTest = !active
     }
 
     fun activeUploadTest(active: Boolean){
@@ -66,12 +65,16 @@ class NetworkBenchmarkService : Service() {
 
     fun startBenchmark(handler: Handler) {
         //벤치마크를 시작함
-        thread(start = true) {
-            val speedTest = SpeedTestSocket()
+        testThread = thread(start = true) {
+            speedTest = SpeedTestSocket()
+            val threadID = android.os.Process.myTid()
 
-            speedTest.addSpeedTestListener(object : ISpeedTestListener {
+            speedTest?.addSpeedTestListener(object : ISpeedTestListener {
+                val listenerThreadID = android.os.Process.myTid()
+
                 override fun onError(speedTestError: SpeedTestError?, errorMessage: String?) {
-                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                    benchmarkLogger.append(errorMessage)
+                    handler.sendMessage(Message())
                 }
 
                 override fun onProgress(percent: Float, report: SpeedTestReport?) {
@@ -81,16 +84,16 @@ class NetworkBenchmarkService : Service() {
 
                     benchmarkLogger.clear()
 
-                    val rateKiloByte = report.transferRateBit.toDouble() / (8 * 1024)
-                    val rateMegaByte = report.transferRateBit.toDouble() / (8 * 1024 * 1024)
+                    val rateKiloByte = report.transferRateBit.toDouble() / (1024)
+                    val rateMegaByte = report.transferRateBit.toDouble() / (1024 * 1024)
 
-                    Log.d("test", "[PROGRESS] progress : $percent %");
+                    Log.d("test [$listenerThreadID]", "[PROGRESS] progress : $percent %")
                     if (rateMegaByte < 1) {
-                        Log.d("test", "[PROGRESS] rate in : $rateKiloByte Kb/s \n")
-                        benchmarkLogger.append("[PROGRESS] rate in : $rateKiloByte Kb/s \n")
+                        Log.d("test [$listenerThreadID]", "[PROGRESS] rate in : $rateKiloByte Kbps \n")
+                        benchmarkLogger.append("[PROGRESS] rate in : $rateKiloByte Kbps \n")
                     } else {
-                        Log.d("test", "[PROGRESS] rate in : $rateMegaByte Mb/s \n")
-                        benchmarkLogger.append("[PROGRESS] rate in : $rateMegaByte Kb/s \n")
+                        Log.d("test [$listenerThreadID]", "[PROGRESS] rate in : $rateMegaByte Mbps \n")
+                        benchmarkLogger.append("[PROGRESS] rate in : $rateMegaByte Mbps \n")
                     }
 
                     handler.sendMessage(Message())
@@ -101,25 +104,33 @@ class NetworkBenchmarkService : Service() {
                         throw RuntimeException("speedtest report is Empty")
                     }
 
-                    val rateKiloByte = report.transferRateBit.toDouble() / (8 * 1024)
-                    val rateMegaByte = report.transferRateBit.toDouble() / (8 * 1024 * 1024)
+                    val rateKiloByte = report.transferRateBit.toDouble() / (1024)
+                    val rateMegaByte = report.transferRateBit.toDouble() / (1024 * 1024)
 
                     if (rateMegaByte < 1) {
-                        Log.d("test", "[PROGRESS] rate in : $rateKiloByte Kb/s")
+                        Log.d("test [$listenerThreadID]", "[COMPLETE] rate in : $rateKiloByte Kbps")
                     } else {
-                        Log.d("test", "[PROGRESS] rate in : $rateMegaByte Mb/s")
+                        Log.d("test [$listenerThreadID]", "[COMPLETE] rate in : $rateMegaByte Mbps")
                     }
+
+                    benchmarkLogger.append("\n\n\n\n 벤치마크테스트가 완료되었습니다.")
+                    handler.sendMessage(Message())
                 }
             })
 
             if (isDownloadTest == true) {
-                Log.d("test", "다운로드 테스트를 시작합니다.")
-                speedTest.startDownload("ftp://speedtest.tele2.net/100MB.zip")
+                Log.d("test [$threadID]", "다운로드 테스트를 시작합니다.")
+                speedTest?.startDownload("http://ipv4.ikoula.testdebit.info/1G.iso")
             } else {
-                Log.d("test", "업로드 테스트를 시작합니다.")
-                val fileName = SpeedTestUtils.generateFileName() + ".txt"
-                speedTest.startUpload("ftp://speedtest.tele2.net/upload/$fileName", 1000000)
+                Log.d("test [$threadID]", "업로드 테스트를 시작합니다.")
+                speedTest?.startUpload("http://ipv4.ikoula.testdebit.info/", 99000000)
             }
         }
+    }
+
+    fun stopBenchmark() {
+        speedTest?.forceStopTask()
+        speedTest?.shutdownAndWait()
+        testThread?.interrupt()
     }
 }

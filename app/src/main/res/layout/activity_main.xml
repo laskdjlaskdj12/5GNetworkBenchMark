@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".activity.MainActivity">
 
     <TextView
         android:id="@+id/logView"
@@ -85,5 +85,14 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/downloadTestSwitch" />
+
+    <Button
+        android:id="@+id/checkStopButton"
+        android:layout_width="141dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="16dp"
+        android:text="check stop"
+        app:layout_constraintStart_toStartOf="@+id/uploadTestSwitch"
+        app:layout_constraintTop_toBottomOf="@+id/uploadTestSwitch" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
