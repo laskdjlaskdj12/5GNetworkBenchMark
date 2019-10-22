@@ -13,7 +13,7 @@ import fr.bmartel.speedtest.inter.ISpeedTestListener
 import fr.bmartel.speedtest.model.SpeedTestError
 import kotlin.concurrent.thread
 
-
+@Deprecated("Don't use this as Background Service")
 class NetworkBenchmarkService : Service() {
 
     private val binder = LocalBinder()
