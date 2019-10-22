@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.example.a5gnetworkbenchmark.R
-import com.example.a5gnetworkbenchmark.task.NetworkBenchmarkTask
+import com.example.a5gnetworkbenchmark.component.asynctask.NetworkBenchmarkTask
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -16,28 +16,29 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        checkStopButton.isEnabled = false
 
         startButton.setOnClickListener {
-            networkBenchmarkTask = NetworkBenchmarkTask()
-            networkBenchmarkTask.logViewUI = logView
 
-            if(downloadTestSwitch.isChecked){
-                networkBenchmarkTask.activeDownloadTest()
-            } else if(uploadTestSwitch.isChecked){
-                networkBenchmarkTask.activeUploadTest()
-            } else{
+            if(!downloadTestSwitch.isChecked && !uploadTestSwitch.isChecked){
                 logView.text = "[알림] : 반드시 다운로드나 업로드를 체크를 해주셔야합니다."
                 return@setOnClickListener
             }
 
+            networkBenchmarkTask = NetworkBenchmarkTask.Builder()
+                .isDownloadTest(downloadTestSwitch.isChecked)
+                .isUploadTest(uploadTestSwitch.isChecked)
+                .logViewUI(logView)
+                .build()
+
             networkBenchmarkTask.execute()
 
             startButton.isEnabled = false
+            checkStopButton.isEnabled = true
         }
 
         stopButton.setOnClickListener {
             networkBenchmarkTask.forceStopTest()
-
             startButton.isEnabled = true
         }
 

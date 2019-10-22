@@ -1,4 +1,4 @@
-package com.example.a5gnetworkbenchmark.task
+package com.example.a5gnetworkbenchmark.component.asynctask
 
 import android.os.AsyncTask
 import android.util.Log
@@ -12,25 +12,31 @@ import fr.bmartel.speedtest.model.UploadStorageType
 import java.lang.StringBuilder
 
 
-class NetworkBenchmarkTask: AsyncTask<Void, String, String>(){
+class NetworkBenchmarkTask : AsyncTask<Void, String, String>() {
     private val speedTestSocket = SpeedTestSocket()
     private val benchmarkLogger = StringBuilder()
+    private var isDownloadTest: Boolean = false
+    private var isUploadTest: Boolean = false
+    private var logViewUI: TextView? = null
 
-    var isDownloadTest:Boolean = false
-    var isUploadTest:Boolean = false
-    var logViewUI:TextView? = null
-
-    fun activeDownloadTest() {
-        isDownloadTest = true
-        isUploadTest = false
+    data class Builder(
+        var isDownloadTest: Boolean = false,
+        var isUploadTest: Boolean = false,
+        var logViewUI: TextView? = null
+    ) {
+        fun isDownloadTest(active: Boolean) = apply { isDownloadTest = active }
+        fun isUploadTest(active: Boolean) = apply { isUploadTest = active }
+        fun logViewUI(view: TextView) = apply { logViewUI = view }
+        fun build():NetworkBenchmarkTask {
+            return NetworkBenchmarkTask().apply {
+                this.isDownloadTest = this@Builder.isDownloadTest
+                this.isUploadTest = this@Builder.isUploadTest
+                this.logViewUI = this@Builder.logViewUI
+            }
+        }
     }
 
-    fun activeUploadTest() {
-        isDownloadTest = false
-        isUploadTest = true
-    }
-
-    fun forceStopTest(){
+    fun forceStopTest() {
         Log.d("test", "=========================== 벤치마크를 중단합니다. ================")
 
         speedTestSocket.forceStopTask()
@@ -97,11 +103,11 @@ class NetworkBenchmarkTask: AsyncTask<Void, String, String>(){
 
     override fun onProgressUpdate(vararg values: String?) {
 
-        if(logViewUI == null){
+        if (logViewUI == null) {
             return
         }
 
-        for (log in values){
+        for (log in values) {
             logViewUI!!.text = log
         }
 

@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <service
-            android:name=".service.NetworkBenchmarkService"
+            android:name="com.example.a5gnetworkbenchmark.component.service.NetworkBenchmarkService"
             android:enabled="true"
             android:exported="true"></service>
 
