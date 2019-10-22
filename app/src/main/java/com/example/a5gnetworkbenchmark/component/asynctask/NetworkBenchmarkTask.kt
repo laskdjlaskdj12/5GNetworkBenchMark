@@ -90,7 +90,7 @@ class NetworkBenchmarkTask : AsyncTask<Void, String, String>() {
         })
 
         speedTestSocket.uploadStorageType = UploadStorageType.FILE_STORAGE
-        if (isDownloadTest == true) {
+        if (isDownloadTest) {
             Log.d("test", "다운로드 테스트를 시작합니다.")
             speedTestSocket.startDownload("http://ipv4.ikoula.testdebit.info/1G.iso")
         } else {
